@@ -1,7 +1,7 @@
 # openHAB EEBus Binding
 
 > **Superseded.** After discussion on [openhab/openhab-addons#21211](https://github.com/openhab/openhab-addons/issues/21211),
-> openHAB maintainer @kaikreuzer pointed out that this functionality — openHAB *passively accepting* LPC/LPP power
+> openHAB maintainer @kaikreuzer pointed out that this functionality — openHAB _passively accepting_ LPC/LPP power
 > limits from an external CEM/CLS gateway — fits openHAB's **IO add-on** pattern (like `org.openhab.io.homekit`)
 > better than a Thing-based binding, since LPC/LPP are household-wide singleton limits, not per-device data points.
 > That rework is built as `org.openhab.io.eebus` (service config + `eebus="lpc"`/`"lpp"` item metadata instead of a
@@ -16,7 +16,7 @@
 > tests pass) and was live-tested against a real independent EEBus implementation
 > ([meisel2000/eebus-cbsim](https://github.com/meisel2000/eebus-cbsim), built on the `enbility/eebus-go` stack) —
 > SHIP pairing (TLS handshake, mDNS discovery, SKI-based trust) and SPINE LPC use-case discovery/data exchange all
-> verified working end-to-end. Not verified: a full accepted *active* limit write from a real CEM (blocked on
+> verified working end-to-end. Not verified: a full accepted _active_ limit write from a real CEM (blocked on
 > a simulator-side heartbeat quirk, not this binding — see commit history / linked issue for details). No EEBus
 > hardware was used in this development; testing was simulator-only.
 >
