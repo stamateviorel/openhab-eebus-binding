@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thing:thing-descriptions bindingId="eebus"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:thing="https://openhab.org/schemas/thing-description/v1.0.0"
+	xsi:schemaLocation="https://openhab.org/schemas/thing-description/v1.0.0 https://openhab.org/schemas/thing-description-1.0.0.xsd">
+
+	<thing-type id="controllableSystem">
+		<label>EEBus Controllable System</label>
+		<description>A local EEBus SHIP/SPINE node that presents openHAB as an EEBus Controllable System (CS). A
+			remote CEM/EMS
+			or smart-meter CLS gateway pairs with this node and issues LPC/LPP power limits.</description>
+		<semantic-equipment-tag>NetworkAppliance</semantic-equipment-tag>
+
+		<channels>
+			<channel id="ownSki" typeId="ownSki"/>
+			<channel id="lpcState" typeId="csState">
+				<label>LPC State</label>
+				<description>State of the Limitation of Power Consumption controllable-system state machine.</description>
+			</channel>
+			<channel id="lpcActiveLimit" typeId="activeLimit">
+				<label>LPC Active Limit</label>
+				<description>The currently active consumption power limit.</description>
+			</channel>
+			<channel id="lpcActiveLimitDuration" typeId="activeLimitDuration">
+				<label>LPC Active Limit Duration</label>
+				<description>ISO 8601 duration the current consumption limit remains valid for, if any.</description>
+			</channel>
+			<channel id="lpcEvent" typeId="csEvent">
+				<label>LPC Event</label>
+				<description>Fires when the LPC state machine transitions state.</description>
+			</channel>
+			<channel id="lppState" typeId="csState">
+				<label>LPP State</label>
+				<description>State of the Limitation of Power Production controllable-system state machine.</description>
+			</channel>
+			<channel id="lppActiveLimit" typeId="activeLimit">
+				<label>LPP Active Limit</label>
+				<description>The currently active production power limit.</description>
+			</channel>
+			<channel id="lppActiveLimitDuration" typeId="activeLimitDuration">
+				<label>LPP Active Limit Duration</label>
+				<description>ISO 8601 duration the current production limit remains valid for, if any.</description>
+			</channel>
+			<channel id="lppEvent" typeId="csEvent">
+				<label>LPP Event</label>
+				<description>Fires when the LPP state machine transitions state.</description>
+			</channel>
+		</channels>
+
+		<representation-property>ownSki</representation-property>
+
+		<config-description>
+			<parameter-group name="network">
+				<label>Network</label>
+			</parameter-group>
+			<parameter-group name="identity">
+				<label>SHIP/SPINE Identity</label>
+			</parameter-group>
+			<parameter-group name="pairing">
+				<label>Pairing</label>
+			</parameter-group>
+			<parameter-group name="lpc">
+				<label>LPC (Consumption Limitation)</label>
+			</parameter-group>
+			<parameter-group name="lpp">
+				<label>LPP (Production Limitation)</label>
+			</parameter-group>
+
+			<parameter name="bindAddress" type="text" groupName="network">
+				<context>network-address</context>
+				<label>Bind Address</label>
+				<description>Local IP address the SHIP WebSocket server binds to. Use 0.0.0.0 to bind all
+					interfaces.</description>
+				<default>0.0.0.0</default>
+				<advanced>true</advanced>
+			</parameter>
+			<parameter name="port" type="integer" min="1" max="65535" groupName="network">
+				<label>Port</label>
+				<description>TCP port the SHIP WebSocket server listens on. EEBus does not mandate a fixed port;
+					remote nodes find it
+					via mDNS.</description>
+				<default>4712</default>
+			</parameter>
+			<parameter name="wssPath" type="text" groupName="network">
+				<label>WebSocket Path</label>
+				<description>HTTP path the SHIP WebSocket endpoint is served under.</description>
+				<default>/ship/</default>
+				<advanced>true</advanced>
+			</parameter>
+			<parameter name="serviceDomain" type="text" groupName="network">
+				<label>mDNS Domain</label>
+				<description>mDNS domain used for SHIP service advertisement/discovery.</description>
+				<default>local.</default>
+				<advanced>true</advanced>
+			</parameter>
+
+			<parameter name="deviceId" type="text" required="true" groupName="identity">
+				<label>Device ID</label>
+				<description>Unique SPINE device identifier for this node. Change the default to something unique
+					to your
+					installation before pairing with a real EEBus partner.</description>
+				<default>d:_i:openHAB:controllable-system-01</default>
+			</parameter>
+			<parameter name="friendlyName" type="text" groupName="identity">
+				<label>Friendly Name</label>
+				<description>Human-readable name advertised to pairing partners.</description>
+				<default>openHAB</default>
+			</parameter>
+			<parameter name="deviceType" type="text" groupName="identity">
+				<label>SPINE Device Type</label>
+				<description>SPINE device type reported to pairing partners.</description>
+				<default>GENERIC</default>
+				<advanced>true</advanced>
+				<options>
+					<option value="GENERIC">Generic</option>
+					<option value="ENERGY_MANAGEMENT_SYSTEM">Energy Management System</option>
+					<option value="CHARGING_STATION">Charging Station</option>
+					<option value="HEAT_GENERATION_SYSTEM">Heat Generation System</option>
+					<option value="HEAT_SINK_SYSTEM">Heat Sink System</option>
+					<option value="HEAT_STORAGE_SYSTEM">Heat Storage System</option>
+					<option value="ELECTRICITY_SUPPLY_SYSTEM">Electricity Supply System</option>
+					<option value="INVERTER">Inverter</option>
+					<option value="SUB_METER">Sub Meter</option>
+				</options>
+			</parameter>
+			<parameter name="entityType" type="text" groupName="identity">
+				<label>SPINE Entity Type</label>
+				<description>SPINE entity type hosting the LPC/LPP use cases. Limited to the entity types the
+					jEEBus LPC/LPP
+					implementation actually allows (verified live against a real EEBus
+					partner) - CEM is the correct default for a
+					generic controllable system; pick a more
+					specific type (e.g. EVSE, HEAT_PUMP_APPLIANCE) if your partner requires it.</description>
+				<default>CEM</default>
+				<advanced>true</advanced>
+				<options>
+					<option value="CEM">CEM (generic controllable system)</option>
+					<option value="COMPRESSOR">Compressor</option>
+					<option value="EVSE">EVSE</option>
+					<option value="HEAT_PUMP_APPLIANCE">Heat Pump Appliance</option>
+					<option value="INVERTER">Inverter</option>
+					<option value="SMART_ENERGY_APPLIANCE">Smart Energy Appliance</option>
+					<option value="SUB_METER_ELECTRICITY">Sub Meter Electricity</option>
+				</options>
+			</parameter>
+
+			<parameter name="connectPolicy" type="text" groupName="pairing">
+				<label>Connect Policy</label>
+				<description>Which remote SHIP nodes are allowed to connect. TRUSTED only accepts nodes whose SKI
+					is listed below;
+					ALL accepts any node (not recommended); NONE rejects new pairings.</description>
+				<default>TRUSTED</default>
+				<options>
+					<option value="TRUSTED">Trusted SKIs only</option>
+					<option value="ALL">All (insecure)</option>
+					<option value="NONE">None</option>
+				</options>
+			</parameter>
+			<parameter name="trustedSkis" type="text" groupName="pairing">
+				<label>Trusted SKIs</label>
+				<description>Comma-separated list of remote SHIP Subject Key Identifiers (SKIs) to pre-trust, e.g.
+					the SKI printed on
+					your CLS gateway. Only used when Connect Policy is "Trusted SKIs only".</description>
+			</parameter>
+			<parameter name="autoAcceptPairing" type="boolean" groupName="pairing">
+				<label>Auto-Accept Pairing Requests</label>
+				<description>Accept any pairing request without a pre-trusted SKI. Only intended for lab testing
+					against a simulator
+					- never enable this against a production installation.</description>
+				<default>false</default>
+				<advanced>true</advanced>
+			</parameter>
+
+			<parameter name="lpcEnabled" type="boolean" groupName="lpc">
+				<label>Enable LPC</label>
+				<description>Expose the Limitation of Power Consumption use case.</description>
+				<default>true</default>
+			</parameter>
+			<parameter name="lpcNominalMaxWatts" type="integer" min="0" unit="W" groupName="lpc">
+				<label>Nominal Max Consumption</label>
+				<description>The maximum power this installation could ever consume, reported to the CEM as the
+					LPC nominal max
+					value.</description>
+				<default>4200</default>
+			</parameter>
+			<parameter name="lpcFailsafeLimitWatts" type="integer" min="0" unit="W" groupName="lpc">
+				<label>Failsafe Consumption Limit</label>
+				<description>Limit applied automatically if the pairing partner stops sending heartbeats. Review
+					and lower this to a
+					value your installation's wiring/fuse can safely sustain unattended - it
+					does NOT default to a safe value
+					automatically.</description>
+				<default>4200</default>
+				<advanced>true</advanced>
+			</parameter>
+			<parameter name="lpcFailsafeDuration" type="text" groupName="lpc">
+				<label>Failsafe Duration</label>
+				<description>ISO 8601 duration the failsafe limit is considered valid for after communication is
+					lost (e.g. PT2H for
+					2 hours).</description>
+				<default>PT2H</default>
+				<advanced>true</advanced>
+			</parameter>
+
+			<parameter name="lppEnabled" type="boolean" groupName="lpp">
+				<label>Enable LPP</label>
+				<description>Expose the Limitation of Power Production use case.</description>
+				<default>false</default>
+			</parameter>
+			<parameter name="lppNominalMaxWatts" type="integer" min="0" unit="W" groupName="lpp">
+				<label>Nominal Max Production</label>
+				<description>The maximum power this installation could ever feed in, reported to the CEM as the
+					LPP nominal max
+					value.</description>
+				<default>0</default>
+			</parameter>
+			<parameter name="lppFailsafeLimitWatts" type="integer" min="0" unit="W" groupName="lpp">
+				<label>Failsafe Production Limit</label>
+				<description>Limit applied automatically if the pairing partner stops sending heartbeats. Review
+					and set this to a
+					value appropriate for your installation - it does NOT default to a safe
+					value automatically.</description>
+				<default>0</default>
+				<advanced>true</advanced>
+			</parameter>
+			<parameter name="lppFailsafeDuration" type="text" groupName="lpp">
+				<label>Failsafe Duration</label>
+				<description>ISO 8601 duration the failsafe limit is considered valid for after communication is
+					lost (e.g. PT2H for
+					2 hours).</description>
+				<default>PT2H</default>
+				<advanced>true</advanced>
+			</parameter>
+		</config-description>
+	</thing-type>
+
+	<channel-type id="ownSki">
+		<item-type>String</item-type>
+		<label>Own SKI</label>
+		<description>This node's own Subject Key Identifier. Give this to your CLS gateway/EMS installer to
+			pre-trust this
+			node.</description>
+		<state readOnly="true"/>
+	</channel-type>
+
+	<channel-type id="csState">
+		<item-type>String</item-type>
+		<label>Controllable System State</label>
+		<description>Current state of the controllable-system state machine.</description>
+		<state readOnly="true">
+			<options>
+				<option value="INIT">Init</option>
+				<option value="CONTROLLED">Controlled</option>
+				<option value="LIMITED">Limited</option>
+				<option value="FAILSAFE">Failsafe</option>
+				<option value="AUTONOMOUS">Autonomous</option>
+			</options>
+		</state>
+	</channel-type>
+
+	<channel-type id="activeLimit">
+		<item-type>Number:Power</item-type>
+		<label>Active Limit</label>
+		<description>Currently active power limit as reported by the state machine.</description>
+		<state readOnly="true" pattern="%.0f %unit%"/>
+	</channel-type>
+
+	<channel-type id="activeLimitDuration">
+		<item-type>String</item-type>
+		<label>Active Limit Duration</label>
+		<description>ISO 8601 duration the active limit remains valid for, if reported by the pairing partner.</description>
+		<state readOnly="true"/>
+	</channel-type>
+
+	<channel-type id="csEvent">
+		<kind>trigger</kind>
+		<label>Controllable System Event</label>
+		<description>Fires whenever the controllable-system state machine processes an event.</description>
+		<event>
+			<options>
+				<option value="INIT_TIMEOUT">Init Timeout</option>
+				<option value="HEARTBEAT_TIMEOUT">Heartbeat Timeout</option>
+				<option value="ACTIVE_LIMIT_RECEIVED">Active Limit Received</option>
+				<option value="LIMIT_DEACTIVATED">Limit Deactivated</option>
+				<option value="FAILSAFE_TIMEOUT">Failsafe Timeout</option>
+			</options>
+		</event>
+	</channel-type>
+
+</thing:thing-descriptions>

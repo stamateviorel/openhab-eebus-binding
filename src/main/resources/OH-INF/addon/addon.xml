@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon:addon id="eebus" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:addon="https://openhab.org/schemas/addon/v1.0.0"
+	xsi:schemaLocation="https://openhab.org/schemas/addon/v1.0.0 https://openhab.org/schemas/addon-1.0.0.xsd">
+
+	<type>binding</type>
+	<name>EEBus Binding</name>
+	<description>This binding lets openHAB present itself as an EEBus Controllable System, so a smart-meter CLS
+		gateway or
+		energy management system can pair with it and issue LPC (Limitation of Power Consumption) and
+		LPP (Limitation of Power
+		Production) power limits, e.g. for §14a EnWG compliance in Germany.</description>
+
+</addon:addon>
