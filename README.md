@@ -1,18 +1,29 @@
 # openHAB EEBus Binding
 
-> **Status**: early, working prototype. Builds clean (checkstyle/spotbugs/spotless/i18n all pass, 12/12 unit
-> tests pass) and has been live-tested against a real independent EEBus implementation
+> **Superseded.** After discussion on [openhab/openhab-addons#21211](https://github.com/openhab/openhab-addons/issues/21211),
+> openHAB maintainer @kaikreuzer pointed out that this functionality — openHAB *passively accepting* LPC/LPP power
+> limits from an external CEM/CLS gateway — fits openHAB's **IO add-on** pattern (like `org.openhab.io.homekit`)
+> better than a Thing-based binding, since LPC/LPP are household-wide singleton limits, not per-device data points.
+> That rework is built as `org.openhab.io.eebus` (service config + `eebus="lpc"`/`"lpp"` item metadata instead of a
+> Thing/channels) on branch [`eebus-io`](https://github.com/stamateviorel/openhab-addons/tree/eebus-io) of the
+> `openhab-addons` fork. It reuses this binding's SHIP/SPINE/certificate plumbing as-is and has since been
+> live-tested the same way this binding was (see below) — including catching and fixing one more real bug specific
+> to the rework (entity selection when a use case is added dynamically after the SPINE device is built).
+>
+> This repo is kept for history. New work continues on the `eebus-io` branch above, not here.
+>
+> **Status when this binding was active**: builds clean (checkstyle/spotbugs/spotless/i18n all pass, 12/12 unit
+> tests pass) and was live-tested against a real independent EEBus implementation
 > ([meisel2000/eebus-cbsim](https://github.com/meisel2000/eebus-cbsim), built on the `enbility/eebus-go` stack) —
 > SHIP pairing (TLS handshake, mDNS discovery, SKI-based trust) and SPINE LPC use-case discovery/data exchange all
-> verified working end-to-end. Not yet verified: a full accepted *active* limit write from a real CEM (blocked on
+> verified working end-to-end. Not verified: a full accepted *active* limit write from a real CEM (blocked on
 > a simulator-side heartbeat quirk, not this binding — see commit history / linked issue for details). No EEBus
-> hardware has been used in this development; testing so far is simulator-only.
+> hardware was used in this development; testing was simulator-only.
 >
 > This is a mirror of `bundles/org.openhab.binding.eebus/` from a working branch against
 > [openhab/openhab-addons](https://github.com/openhab/openhab-addons) - it needs that repo's parent reactor POM to
 > build (`mvn -pl bundles/org.openhab.binding.eebus -am package` from an openhab-addons checkout with this bundle
-> added), it isn't standalone-buildable on its own. Published here for visibility/feedback ahead of an eventual
-> upstream PR; see [openhab/openhab-addons#21211](https://github.com/openhab/openhab-addons/issues/21211).
+> added), it isn't standalone-buildable on its own.
 
 # EEBus Binding
 
